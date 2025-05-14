@@ -1,26 +1,53 @@
 import React, { useState } from "react";
 import GraphView from "./GraphView";
-
+import { useEffect } from "react";
 const Search = () => {
   const [artist, setArtist] = useState("");
   const [graph, setGraph] = useState({ nodes: [], links: [] });
   const token = window.localStorage.getItem("token");
 
   const handleSearch = async () => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}&type=artist&limit=1`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    if (!token) {
+      alert("Spotify認証が切れています。再ログインしてください。");
+      window.location.href = "/";
+      return;
+    }
+  
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist)}&type=artist&limit=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (!res.ok) {
+        if (res.status === 401) {
+          alert("トークンが無効になっています。再ログインしてください。");
+          localStorage.removeItem("token");
+          window.location.href = "/";
+          return;
+        }
+        throw new Error(`Spotify API エラー: ${res.status}`);
       }
-    );
-    const data = await res.json();
-    const mainArtist = data.artists.items[0];
-    if (mainArtist) {
+  
+      const data = await res.json();
+      const mainArtist = data.artists?.items?.[0];
+  
+      if (!mainArtist) {
+        alert("アーティストが見つかりませんでした。");
+        return;
+      }
+  
       fetchRelated(mainArtist);
+    } catch (err) {
+      console.error("検索エラー:", err);
+      alert("検索に失敗しました。ネットワークやAPIの状態を確認してください。");
     }
   };
+  
 
   const fetchRelated = async (mainArtist) => {
     const res = await fetch(
@@ -47,6 +74,12 @@ const Search = () => {
 
     setGraph({ nodes: newNodes, links: newLinks });
   };
+  useEffect(() => {
+    if (!token) {
+      alert("Spotify認証が切れているため、再ログインしてください。");
+      window.location.href = "/";
+    }
+  }, []);
 
   return (
     <div>
