@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const SPOTIFY_CLIENT_ID = "あなたのClient ID";
+const SPOTIFY_CLIENT_ID = "34c722b042f54c32aaaddab68514c165";
 const REDIRECT_URI = "https://artist-network.vercel.app/callback";
 
 const Callback = () => {
