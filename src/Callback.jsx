@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Callback = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [token, setToken] = useState("");
 
   useEffect(() => {
@@ -16,16 +17,17 @@ const Callback = () => {
       if (_token) {
         window.localStorage.setItem("token", _token);
         setToken(_token);
+        navigate("/search"); // ← ★ここで /search に自動遷移させる
       }
-    } else {
+    } else if (tokenFromStorage) {
       setToken(tokenFromStorage);
+      navigate("/search");
     }
-  }, [location]);
+  }, [location, navigate]);
 
   return (
     <div>
-      <h2>アクセストークン取得完了</h2>
-      <p>{token}</p>
+      <h2>アクセストークン取得完了！</h2>
     </div>
   );
 };
