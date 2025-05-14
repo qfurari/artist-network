@@ -6,6 +6,8 @@ const REDIRECT_URI = "https://artist-network.vercel.app/callback";
 const Login = () => {
   const handleLogin = async () => {
     const codeVerifier = generateRandomString(64);
+    localStorage.setItem("code_verifier", codeVerifier);
+    console.log("保存するcode_verifier:", codeVerifier);
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     localStorage.setItem("code_verifier", codeVerifier);
 
@@ -19,6 +21,8 @@ const Login = () => {
     });
 
     window.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
+    
+
   };
 
   return (

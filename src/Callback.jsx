@@ -11,6 +11,8 @@ const Callback = () => {
   useEffect(() => {
     const code = new URLSearchParams(location.search).get("code");
     const codeVerifier = localStorage.getItem("code_verifier");
+    localStorage.setItem("code_verifier", codeVerifier);
+    console.log("保存するcode_verifier:", codeVerifier);
 
     if (code && codeVerifier) {
       const body = new URLSearchParams({
@@ -34,6 +36,7 @@ const Callback = () => {
           navigate("/search");
         });
     }
+    
   }, [location, navigate]);
 
   return <h2>トークンを取得中...</h2>;
