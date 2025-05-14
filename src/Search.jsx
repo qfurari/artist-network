@@ -50,30 +50,51 @@ const Search = () => {
   
 
   const fetchRelated = async (mainArtist) => {
-    const res = await fetch(
-      `https://api.spotify.com/v1/artists/${mainArtist.id}/related-artists`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    if (!mainArtist?.id) {
+      alert("アーティスト情報が不完全です。再度検索してください。");
+      return;
+    }
+  
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/artists/${mainArtist.id}/related-artists`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (!res.ok) {
+        throw new Error(`related-artists API Error: ${res.status}`);
       }
-    );
-    const data = await res.json();
-    const related = data.artists.slice(0, 6);
-
-    const newNodes = [mainArtist, ...related].map((a) => ({
-      id: a.id,
-      name: a.name,
-      group: 1,
-    }));
-
-    const newLinks = related.map((a) => ({
-      source: mainArtist.id,
-      target: a.id,
-    }));
-
-    setGraph({ nodes: newNodes, links: newLinks });
+  
+      const data = await res.json();
+      const related = data.artists?.slice(0, 6);
+  
+      if (!related || related.length === 0) {
+        alert("関連アーティストが見つかりませんでした。");
+        return;
+      }
+  
+      const newNodes = [mainArtist, ...related].map((a) => ({
+        id: a.id,
+        name: a.name,
+        group: 1,
+      }));
+  
+      const newLinks = related.map((a) => ({
+        source: mainArtist.id,
+        target: a.id,
+      }));
+  
+      setGraph({ nodes: newNodes, links: newLinks });
+    } catch (err) {
+      console.error("❌ fetchRelated error:", err);
+      alert("関連アーティスト取得に失敗しました。ネットワークやトークンを確認してください。");
+    }
   };
+  
   useEffect(() => {
     if (!token) {
       alert("Spotify認証が切れているため、再ログインしてください。");
