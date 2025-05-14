@@ -1,5 +1,5 @@
 const SPOTIFY_CLIENT_ID = "34c722b042f54c32aaaddab68514c165";
-const REDIRECT_URI = "https://example.com/callback";
+const REDIRECT_URI = "https://artist-network.vercel.app/callback";
 const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
 const RESPONSE_TYPE = "token";
 
