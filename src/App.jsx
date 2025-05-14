@@ -8,6 +8,7 @@ const App = () => (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/callback" element={<Callback />} />
+      <Route path="/search" element={<Search />} /> 
     </Routes>
   </Router>
 );
