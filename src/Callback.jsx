@@ -32,6 +32,7 @@ const Callback = () => {
       })
         .then((res) => res.json())
         .then((data) => {
+          console.log("🔴 Callback: Spotifyトークンレスポンス:", data);
           localStorage.setItem("token", data.access_token);
           navigate("/search");
         });
