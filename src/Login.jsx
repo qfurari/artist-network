@@ -1,11 +1,24 @@
+import { generateCodeChallenge, generateRandomString } from "./pkce-utils";
+
 const SPOTIFY_CLIENT_ID = "34c722b042f54c32aaaddab68514c165";
 const REDIRECT_URI = "https://artist-network.vercel.app/callback";
-const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
-const RESPONSE_TYPE = "token";
 
 const Login = () => {
-  const handleLogin = () => {
-    window.location = `${AUTH_ENDPOINT}?client_id=${SPOTIFY_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=${RESPONSE_TYPE}`;
+  const handleLogin = async () => {
+    const codeVerifier = generateRandomString(64);
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    localStorage.setItem("code_verifier", codeVerifier);
+
+    const params = new URLSearchParams({
+      response_type: "code",
+      client_id: SPOTIFY_CLIENT_ID,
+      scope: "user-read-private user-read-email",
+      redirect_uri: REDIRECT_URI,
+      code_challenge_method: "S256",
+      code_challenge: codeChallenge,
+    });
+
+    window.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
   };
 
   return (

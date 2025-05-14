@@ -1,36 +1,42 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+
+const SPOTIFY_CLIENT_ID = "あなたのClient ID";
+const REDIRECT_URI = "https://artist-network.vercel.app/callback";
 
 const Callback = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [token, setToken] = useState("");
 
   useEffect(() => {
-    const hash = location.hash;
-    const tokenFromStorage = window.localStorage.getItem("token");
+    const code = new URLSearchParams(location.search).get("code");
+    const codeVerifier = localStorage.getItem("code_verifier");
 
-    if (!tokenFromStorage && hash) {
-      const params = new URLSearchParams(hash.substring(1));
-      const _token = params.get("access_token");
+    if (code && codeVerifier) {
+      const body = new URLSearchParams({
+        grant_type: "authorization_code",
+        code,
+        redirect_uri: REDIRECT_URI,
+        client_id: SPOTIFY_CLIENT_ID,
+        code_verifier: codeVerifier,
+      });
 
-      if (_token) {
-        window.localStorage.setItem("token", _token);
-        setToken(_token);
-        navigate("/search"); // ← ★ここで /search に自動遷移させる
-      }
-    } else if (tokenFromStorage) {
-      setToken(tokenFromStorage);
-      navigate("/search");
+      fetch("https://accounts.spotify.com/api/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          localStorage.setItem("token", data.access_token);
+          navigate("/search");
+        });
     }
   }, [location, navigate]);
 
-  return (
-    <div>
-      <h2>アクセストークン取得完了！</h2>
-    </div>
-  );
+  return <h2>トークンを取得中...</h2>;
 };
-
 
 export default Callback;
